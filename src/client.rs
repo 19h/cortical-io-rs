@@ -1,6 +1,6 @@
 use std::error::Error;
 
-use crate::{CompareResponse, CreateCategoryFilterRequest, Fingerprint, LanguageResponse, Retina, TextEnvelope, TextSlice, TextSliceRequest};
+use crate::{CompareResponse, CreateCategoryFilterRequest, CreateCategoryFilterResponse, Fingerprint, LanguageResponse, Retina, TextEnvelope, TextSlice, TextSliceRequest};
 
 pub struct Cortical {
     pub client: reqwest::Client,
@@ -136,7 +136,7 @@ impl Cortical {
         positive_examples: Vec<String>,
         negative_examples: Vec<String>,
         retina_name: Option<&str>,
-    ) -> Result<(), Box<dyn Error>> {
+    ) -> Result<CreateCategoryFilterResponse, Box<dyn Error>> {
         let retina_name = retina_name.unwrap_or("en_general");
 
         let positive_examples = positive_examples

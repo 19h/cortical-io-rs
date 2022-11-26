@@ -140,6 +140,12 @@ pub struct CreateCategoryFilterRequest {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct CreateCategoryFilterResponse {
+    pub category_name: String,
+    pub positions: Vec<u32>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct LanguageResponse {
     pub language: Option<String>,
     pub iso_tag: Option<String>,
