@@ -1,34 +1,66 @@
 use std::error::Error;
+use num;
 
 use serde::{Deserialize, Serialize};
+
+use crate::similarity::FingerprintSimilarity;
+
+pub mod similarity;
+
+#[cfg(feature = "image")]
+pub mod image;
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Retina {
     #[serde(rename = "retinaName")]
     pub retina_name: String,
     #[serde(rename = "numberOfColumns")]
-    pub number_of_columns: i64,
+    pub number_of_columns: u32,
     #[serde(rename = "numberOfTermsInRetina")]
-    pub number_of_terms_in_retina: i64,
+    pub number_of_terms_in_retina: u64,
     pub description: String,
     #[serde(rename = "numberOfRows")]
-    pub number_of_rows: i64,
+    pub number_of_rows: u32,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Fingerprint {
-    pub positions: Vec<i32>,
+    pub positions: Vec<u32>,
 }
 
 impl Fingerprint {
     pub fn expand(&self, len: usize) -> Vec<u8> {
         let mut expanded = vec![0; len];
 
-        for pos in &self.positions {
+        for pos in self.positions.iter() {
             expanded[*pos as usize] = 1;
         }
 
         expanded
+    }
+
+    pub fn expand_t<T: num::Float>(&self, len: usize) -> Vec<T> {
+        let zero = T::from(0).unwrap();
+        let one = T::from(1).unwrap();
+
+        let mut expanded: Vec<T> = vec![zero; len];
+
+        for pos in self.positions.iter() {
+            expanded[*pos as usize] = one;
+        }
+
+        expanded
+    }
+
+    pub fn compare(&self, other: &Fingerprint) -> FingerprintSimilarity {
+        FingerprintSimilarity::new(self, other)
+    }
+}
+
+impl From<Fingerprint> for Vec<f64> {
+    fn from(fingerprint: Fingerprint) -> Self {
+        fingerprint
+            .expand_t::<f64>(128 * 128)
     }
 }
 
@@ -110,13 +142,12 @@ pub struct LanguageResponse {
     pub wiki_url: Option<String>,
 }
 
-
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct CompareResponse {
     #[serde(rename = "sizeLeft")]
-    pub size_left: i64,
+    pub size_left: u32,
     #[serde(rename = "sizeRight")]
-    pub size_right: i64,
+    pub size_right: u32,
     #[serde(rename = "weightedScoring")]
     pub weighted_scoring: f64,
     #[serde(rename = "euclideanDistance")]
@@ -124,7 +155,7 @@ pub struct CompareResponse {
     #[serde(rename = "jaccardDistance")]
     pub jaccard_distance: f64,
     #[serde(rename = "overlappingAll")]
-    pub overlapping_all: i64,
+    pub overlapping_all: u32,
     #[serde(rename = "overlappingLeftRight")]
     pub overlapping_left_right: f64,
     #[serde(rename = "overlappingRightLeft")]
