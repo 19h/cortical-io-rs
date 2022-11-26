@@ -40,20 +40,19 @@ pub struct TextSlice {
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct TextSliceRequest {
+    #[default = "en_general"]
     pub retina_name: String,
+    #[default = 0]
     pub start_index: usize,
+    #[default = 10]
     pub max_results: usize,
+    #[default = false]
     pub get_fingerprint: bool,
 }
 
 impl TextSliceRequest {
     pub fn new() -> Self {
-        Self {
-            retina_name: "en_general".to_string(),
-            start_index: 0,
-            max_results: 10,
-            get_fingerprint: false,
-        }
+        Self::default()
     }
 
     pub fn with_retina_name(mut self, retina_name: &str) -> Self {
