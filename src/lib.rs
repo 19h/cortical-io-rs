@@ -129,19 +129,21 @@ pub struct CompareResponse {
 
 pub struct Cortical {
     pub client: reqwest::Client,
+    pub base_url: String,
 }
 
 impl Cortical {
     pub fn new() -> Cortical {
         Cortical {
             client: reqwest::Client::new(),
+            base_url: std::env::var("CORTICAL_API_URL").unwrap_or("https://languages.cortical.io".to_string()),
         }
     }
 
     pub async fn get_retinas(&self) -> Result<Vec<Retina>, Box<dyn Error>> {
         let response =
             self.client
-                .get("https://languages.cortical.io/rest/retinas")
+                .get(format!("{}{}", &self.base_url, "/rest/retinas"))
                 .send()
                 .await?;
 
@@ -161,7 +163,7 @@ impl Cortical {
 
         let response =
             self.client
-                .post(format!("https://languages.cortical.io/rest/text?retina_name={}", retina_name))
+                .post(format!("{}/rest/text?retina_name={}", &self.base_url, retina_name))
                 .header("Accept", "application/json")
                 .header("Referer", "")
                 .header("Content-Type", "application/json")
@@ -185,7 +187,7 @@ impl Cortical {
 
         let response =
             self.client
-                .post(format!("https://languages.cortical.io/rest/text/keywords?retina_name={}", retina_name))
+                .post(format!("{}/rest/text/keywords?retina_name={}", &self.base_url, retina_name))
                 .header("Accept", "application/json")
                 .header("Referer", "")
                 .header("Content-Type", "text/plain;charset=UTF-8")
@@ -211,7 +213,8 @@ impl Cortical {
             self.client
                 .post(
                     format!(
-                        "https://languages.cortical.io/rest/text/slices?retina_name={}&start_index={}&max_results={}&get_fingerprint={}",
+                        "{}/rest/text/slices?retina_name={}&start_index={}&max_results={}&get_fingerprint={}",
+                        &self.base_url,
                         params.retina_name,
                         params.start_index,
                         params.max_results,
@@ -238,7 +241,7 @@ impl Cortical {
     ) -> Result<LanguageResponse, Box<dyn Error>> {
         let response =
             self.client
-                .post("https://languages.cortical.io/rest/text/detect_language")
+                .post(format!("{}/rest/text/detect_language", &self.base_url))
                 .header("Accept", "application/json")
                 .header("Referer", "")
                 .header("Content-Type", "application/json")
@@ -281,7 +284,8 @@ impl Cortical {
             self.client
                 .post(
                     format!(
-                        "https://languages.cortical.io/rest/classify/create_category_filter?retina_name={}&filter_name={}",
+                        "{}/rest/classify/create_category_filter?retina_name={}&filter_name={}",
+                        &self.base_url
                         retina_name,
                         "filter_name"
                     )
@@ -306,7 +310,7 @@ impl Cortical {
 
         Ok(
             self.client
-                .post(format!("https://languages.cortical.io/rest/compare?retina_name={}", retina_name))
+                .post(format!("{}/rest/compare?retina_name={}", &self.base_url, retina_name))
                 .header("Accept", "application/json")
                 .header("Referer", "")
                 .header("Content-Type", "application/json")
