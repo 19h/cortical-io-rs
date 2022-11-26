@@ -285,7 +285,7 @@ impl Cortical {
                 .post(
                     format!(
                         "{}/rest/classify/create_category_filter?retina_name={}&filter_name={}",
-                        &self.base_url
+                        &self.base_url,
                         retina_name,
                         "filter_name"
                     )
