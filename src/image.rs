@@ -1,7 +1,7 @@
-use std::ops::{Add, Mul};
+
 
 use image;
-use image::{ImageBuffer, load_from_memory};
+use image::{ImageBuffer};
 
 use crate::Fingerprint;
 
@@ -14,7 +14,7 @@ pub fn generate_image_from_fingerprint(
 ) -> image::DynamicImage {
     let fp_vec = fingerprint.expand((IMAGE_WIDTH * IMAGE_HEIGHT) as usize);
 
-    let mut imgbuf =
+    let _imgbuf =
         vec![0; (fp_vec.len() * scale as usize) * scale as usize * 3usize];
 
     let scaled_fp_vec = {
@@ -47,19 +47,19 @@ pub fn generate_image_from_fingerprint(
         scaled_fp_vec
             .into_par_iter()
             .map(|point| {
-                let color = if point == 0 {
+                
+
+                if point == 0 {
                     [255, 255, 255]
                 } else {
                     [0, 0, 0]
-                };
-
-                color
+                }
             })
             .flatten()
             .collect::<Vec<u8>>(),
     ).unwrap();
 
-    return image::DynamicImage::ImageRgb8(buf);
+    image::DynamicImage::ImageRgb8(buf)
 
     //imgbuf
     //    .enumerate_pixels_mut()

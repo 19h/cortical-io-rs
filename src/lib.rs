@@ -1,5 +1,5 @@
 use std::error::Error;
-use num;
+
 
 use serde::{Deserialize, Serialize};
 
@@ -134,13 +134,17 @@ impl TextEnvelope {
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct CreateCategoryFilterRequest {
+    #[serde(rename = "categoryName")]
     pub category_name: Option<String>,
+    #[serde(rename = "positiveExamples")]
     pub positive_examples: Vec<TextEnvelope>,
+    #[serde(rename = "negativeExamples")]
     pub negative_examples: Vec<TextEnvelope>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct CreateCategoryFilterResponse {
+    #[serde(rename = "categoryName")]
     pub category_name: String,
     pub positions: Vec<u32>,
 }

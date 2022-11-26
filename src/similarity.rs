@@ -1,6 +1,6 @@
-use std::collections::HashSet;
-use std::error::Error;
-use std::ops::{Add, Div, Mul, Sub};
+
+
+use std::ops::{Add, Div, Mul};
 
 use serde::{Deserialize, Serialize};
 
@@ -133,9 +133,9 @@ impl FingerprintSimilarity {
             self.exp_vec_left
                 .iter()
                 .zip(self.exp_vec_right.iter())
-                .fold((0.0, 0.0), |(s1, s2), (l, r)| {
+                .fold((0.0, 0.0), |(_s1, s2), (l, r)| {
                     (
-                        s2.add((l - left_mean).mul((r - right_mean))),
+                        s2.add((l - left_mean).mul(r - right_mean)),
                         s2.add((l - left_mean).powi(2).mul((r - right_mean).powi(2))),
                     )
                 });
