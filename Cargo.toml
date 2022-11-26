@@ -6,9 +6,14 @@ description = "Cortical.io API client"
 license = "MIT"
 repository = "https://github.com/19h/cortical-io-rs"
 
+[[example]]
+name = "cortical"
+path = "src/cortical.rs"
+
 [features]
-default = ["image"]
-image = ["dep:image"]
+default = ["image", "client"]
+image = ["dep:image", "dep:rayon"]
+client = ["dep:reqwest"]
 
 [lib]
 name = "cortical_io"
@@ -17,12 +22,22 @@ path = "src/lib.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-reqwest = { version = "0.11.13", features = ["json", "gzip"] }
 serde = { version = "1.0.147", features = ["derive"] }
 serde_json = "1.0.89"
-tokio = { version = "1.22.0", features = ["rt-multi-thread", "macros"] }
 num = "0.4.0"
+
+[dev-dependencies]
+tokio = { version = "1.22.0", features = ["rt-multi-thread", "macros"] }
 
 [dependencies.image]
 version = "0.24.5"
+optional = true
+
+[dependencies.rayon]
+version = "1.6.0"
+optional = true
+
+[dependencies.reqwest]
+version = "^0.11.13"
+features = ["json", "gzip"]
 optional = true

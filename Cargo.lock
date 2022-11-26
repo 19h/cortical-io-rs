@@ -109,6 +109,7 @@ version = "0.1.4-alpha.0"
 dependencies = [
  "image",
  "num",
+ "rayon",
  "reqwest",
  "serde",
  "serde_json",

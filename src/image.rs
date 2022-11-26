@@ -1,6 +1,7 @@
 use std::ops::{Add, Mul};
 
 use image;
+use image::{ImageBuffer, load_from_memory};
 
 use crate::Fingerprint;
 
@@ -14,10 +15,7 @@ pub fn generate_image_from_fingerprint(
     let fp_vec = fingerprint.expand((IMAGE_WIDTH * IMAGE_HEIGHT) as usize);
 
     let mut imgbuf =
-        image::ImageBuffer::new(
-            IMAGE_WIDTH * scale,
-            IMAGE_HEIGHT * scale,
-        );
+        vec![0; (fp_vec.len() * scale as usize) * scale as usize * 3usize];
 
     let scaled_fp_vec = {
         let mut new_vec = vec![0; (fp_vec.len() * scale as usize) * scale as usize];
@@ -41,25 +39,47 @@ pub fn generate_image_from_fingerprint(
         new_vec
     };
 
-    dbg!(scaled_fp_vec.len());
-    dbg!(imgbuf.len() / 3);
+    use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
-    for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
-        let index =
-            y
-                .mul(IMAGE_WIDTH.mul(scale))
-                .add(x);
+    let buf = ImageBuffer::from_raw(
+        IMAGE_WIDTH * scale,
+        IMAGE_HEIGHT * scale,
+        scaled_fp_vec
+            .into_par_iter()
+            .map(|point| {
+                let color = if point == 0 {
+                    [255, 255, 255]
+                } else {
+                    [0, 0, 0]
+                };
 
-        let val = scaled_fp_vec[index as usize];
+                color
+            })
+            .flatten()
+            .collect::<Vec<u8>>(),
+    ).unwrap();
 
-        // if val is 1, render pixel as pink
-        // if val is 0, render pixel as white
-        *pixel = image::Rgb([
-            if val == 1 { 251 } else { 255 },
-            if val == 1 { 72 } else { 255 },
-            if val == 1 { 196 } else { 255 },
-        ]);
-    }
+    return image::DynamicImage::ImageRgb8(buf);
 
-    image::DynamicImage::ImageRgb8(imgbuf)
+    //imgbuf
+    //    .enumerate_pixels_mut()
+    //    .into_par_iter()
+    //    .for_each(|(x, y, pixel)| {
+    //        let index =
+    //            y
+    //                .mul(IMAGE_WIDTH.mul(scale))
+    //                .add(x);
+
+    //        let val = scaled_fp_vec[index as usize];
+
+    //        // if val is 1, render pixel as pink
+    //        // if val is 0, render pixel as white
+    //        *pixel = image::Rgb([
+    //            if val == 1 { 251 } else { 255 },
+    //            if val == 1 { 72 } else { 255 },
+    //            if val == 1 { 196 } else { 255 },
+    //        ]);
+    //    });
+
+    //image::DynamicImage::ImageRgb8(imgbuf)
 }
