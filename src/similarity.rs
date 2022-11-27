@@ -1,5 +1,3 @@
-
-
 use std::ops::{Add, Div, Mul};
 
 use serde::{Deserialize, Serialize};

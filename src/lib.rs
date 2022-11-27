@@ -1,7 +1,9 @@
 use std::error::Error;
 
-
 use serde::{Deserialize, Serialize};
+
+#[cfg(feature = "client")]
+pub use client::Cortical;
 
 use crate::similarity::FingerprintSimilarity;
 
@@ -11,8 +13,6 @@ pub mod similarity;
 pub mod image;
 #[cfg(feature = "client")]
 pub mod client;
-#[cfg(feature = "client")]
-pub use client::Cortical;
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Retina {
