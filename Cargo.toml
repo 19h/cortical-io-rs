@@ -1,6 +1,6 @@
 [package]
 name = "cortical-io"
-version = "0.1.7-alpha.0"
+version = "0.1.7"
 edition = "2021"
 description = "Cortical.io API client"
 license = "MIT"

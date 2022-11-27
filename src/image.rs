@@ -19,12 +19,12 @@ pub fn generate_image_from_fingerprint(
 }
 
 #[inline(always)]
-pub fn visual_rescale_vec_by<T: Integer + Copy>(
+pub fn visual_rescale_vec_by<T: Integer + Copy, P: Integer + Copy>(
     fp_vec: &[T],
     scale: u32,
-    fn_scale: impl Fn(T) -> T,
-) -> Vec<T> {
-    let mut new_vec: Vec<T> =
+    fn_scale: impl Fn(T) -> P,
+) -> Vec<P> {
+    let mut new_vec: Vec<P> =
         Vec::with_capacity(
             (fp_vec.len() * scale as usize) * scale as usize,
         );
@@ -56,7 +56,7 @@ pub fn generate_image_from_vec(
         vec![0; (fp_vec.len() * scale as usize) * scale as usize * 3usize];
 
     let scaled_fp_vec =
-        visual_rescale_vec_by(
+        visual_rescale_vec_by::<u8, u8>(
             fp_vec,
             scale,
             |p| p,
@@ -93,10 +93,10 @@ pub fn generate_height_image_from_vec(
     let fp_max = fp_vec.iter().max().unwrap();
 
     let scaled_fp_vec =
-        visual_rescale_vec_by(
+        visual_rescale_vec_by::<u32, u8>(
             fp_vec,
             scale,
-            |p| p.div(fp_max).mul(255).min(255),
+            |p| p.div(fp_max).mul(255).min(255) as u8,
         );
 
     use rayon::iter::{IntoParallelIterator, ParallelIterator};
