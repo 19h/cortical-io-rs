@@ -24,7 +24,7 @@ pub fn visual_rescale_vec_by<T: Integer + Copy, P: Integer + Copy>(
     scale: u32,
     fn_scale: impl Fn(T) -> P,
 ) -> Vec<P> {
-    let mut new_vec: Vec<P> = vec![T::zero(); (fp_vec.len() * scale as usize) * scale as usize];
+    let mut new_vec: Vec<P> = vec![P::zero(); (fp_vec.len() * scale as usize) * scale as usize];
 
     // when scaling a pixel by 2, make all 4 pixels the same value
     for (i, point) in fp_vec.iter().enumerate() {
