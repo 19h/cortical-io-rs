@@ -1,4 +1,4 @@
-use std::error::Error;
+extern crate core;
 
 use serde::{Deserialize, Serialize};
 
@@ -13,6 +13,8 @@ pub mod similarity;
 pub mod image;
 #[cfg(feature = "client")]
 pub mod client;
+pub mod density;
+pub mod find_peaks;
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Retina {

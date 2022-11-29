@@ -1,8 +1,10 @@
-use std::ops::{Add, Div, Mul};
+use std::ops::{Div, Mul};
 
 use image;
 use image::ImageBuffer;
 use num::Integer;
+use num_traits::cast::FromPrimitive;
+use rayon::iter::{IndexedParallelIterator, IntoParallelIterator, ParallelIterator};
 
 use crate::Fingerprint;
 
@@ -23,8 +25,14 @@ pub fn visual_rescale_vec_by<T: Integer + Copy, P: Integer + Copy>(
     fp_vec: &[T],
     scale: u32,
     fn_scale: impl Fn(T) -> P,
-) -> Vec<P> {
-    let mut new_vec: Vec<P> = vec![P::zero(); (fp_vec.len() * scale as usize) * scale as usize];
+) -> (Vec<P>, Vec<usize>) {
+    let mut new_vec: Vec<P> =
+        vec![P::zero(); (fp_vec.len() * scale as usize) * scale as usize];
+
+    let mut ref_vec: Vec<usize> =
+        vec![0usize; (fp_vec.len() * scale as usize) * scale as usize];
+
+    dbg!(new_vec.len(), ref_vec.len());
 
     // when scaling a pixel by 2, make all 4 pixels the same value
     for (i, point) in fp_vec.iter().enumerate() {
@@ -38,28 +46,24 @@ pub fn visual_rescale_vec_by<T: Integer + Copy, P: Integer + Copy>(
             for y in y_start..y_start + scale as usize {
                 let index = (y * (IMAGE_WIDTH * scale) as usize) + x;
                 new_vec[index] = fn_scale(*point);
+                ref_vec[index] = i;
             }
         }
     }
 
-    new_vec
+    (new_vec, ref_vec)
 }
 
 pub fn generate_image_from_vec(
     fp_vec: &[u8],
     scale: u32,
 ) -> image::DynamicImage {
-    let _imgbuf =
-        vec![0; (fp_vec.len() * scale as usize) * scale as usize * 3usize];
-
-    let scaled_fp_vec =
+    let (scaled_fp_vec, _) =
         visual_rescale_vec_by::<u8, u8>(
             fp_vec,
             scale,
             |p| p,
         );
-
-    use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
     let buf = ImageBuffer::from_raw(
         IMAGE_WIDTH * scale,
@@ -81,34 +85,31 @@ pub fn generate_image_from_vec(
 }
 
 pub fn generate_height_image_from_vec(
-    fp_vec: &Vec<u32>,
+    fp_vec: &[u32],
     scale: u32,
+    fn_color: impl Fn(u8, usize) -> [u8; 3] + Sync,
 ) -> image::DynamicImage {
-    let _imgbuf =
-        vec![0; (fp_vec.len() * scale as usize) * scale as usize * 3usize];
-
     let fp_max = fp_vec.iter().max().unwrap();
 
-    let scaled_fp_vec =
+    let (scaled_fp_vec, ref_vec) =
         visual_rescale_vec_by::<u32, u8>(
             fp_vec,
             scale,
-            |p| p.div(fp_max).mul(255).min(255) as u8,
+            |p|
+                p
+                    .mul(255)
+                    .div(*fp_max.max(&1))
+                    .min(255) as u8,
         );
-
-    use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
     let buf = ImageBuffer::from_raw(
         IMAGE_WIDTH * scale,
         IMAGE_HEIGHT * scale,
         scaled_fp_vec
             .into_par_iter()
-            .map(|point| {
-                if point == 0 {
-                    [255, 255, 255]
-                } else {
-                    [point, point, point]
-                }
+            .enumerate()
+            .map(|(i, point)| {
+                fn_color(point, ref_vec[i])
             })
             .flatten()
             .collect::<Vec<u8>>(),

@@ -109,6 +109,7 @@ version = "0.1.10-alpha.0"
 dependencies = [
  "image",
  "num",
+ "num-traits",
  "rayon",
  "reqwest",
  "serde",
