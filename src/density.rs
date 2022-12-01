@@ -124,10 +124,10 @@ impl Kde {
 
     pub fn determine_kde_params(&mut self) -> Option<()> {
         // find the min and max of x and y respectively
-        self.x_min = self.points.iter().map(|p| p.0).min_by(|a, b| a.partial_cmp(b)?)?;
-        self.x_max = self.points.iter().map(|p| p.0).max_by(|a, b| a.partial_cmp(b)?)?;
-        self.y_min = self.points.iter().map(|p| p.1).min_by(|a, b| a.partial_cmp(b)?)?;
-        self.y_max = self.points.iter().map(|p| p.1).max_by(|a, b| a.partial_cmp(b)?)?;
+        self.x_min = self.points.iter().map(|p| p.0).min_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+        self.x_max = self.points.iter().map(|p| p.0).max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+        self.y_min = self.points.iter().map(|p| p.1).min_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+        self.y_max = self.points.iter().map(|p| p.1).max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
 
         let dx = self.x_max - self.x_min;
         let dy = self.y_max - self.y_min;
