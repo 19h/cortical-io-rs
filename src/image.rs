@@ -14,7 +14,7 @@ const IMAGE_HEIGHT: u32 = 128;
 pub fn generate_image_from_fingerprint(
     fingerprint: &Fingerprint,
     scale: u32,
-) -> image::DynamicImage {
+) -> Option<image::DynamicImage> {
     let fp_vec = fingerprint.expand((IMAGE_WIDTH * IMAGE_HEIGHT) as usize);
 
     generate_image_from_vec(&fp_vec, scale)
@@ -31,8 +31,6 @@ pub fn visual_rescale_vec_by<T: Integer + Copy, P: Integer + Copy>(
 
     let mut ref_vec: Vec<usize> =
         vec![0usize; (fp_vec.len() * scale as usize) * scale as usize];
-
-    dbg!(new_vec.len(), ref_vec.len());
 
     // when scaling a pixel by 2, make all 4 pixels the same value
     for (i, point) in fp_vec.iter().enumerate() {
@@ -57,7 +55,7 @@ pub fn visual_rescale_vec_by<T: Integer + Copy, P: Integer + Copy>(
 pub fn generate_image_from_vec(
     fp_vec: &[u8],
     scale: u32,
-) -> image::DynamicImage {
+) -> Option<image::DynamicImage> {
     let (scaled_fp_vec, _) =
         visual_rescale_vec_by::<u8, u8>(
             fp_vec,
@@ -79,17 +77,17 @@ pub fn generate_image_from_vec(
             })
             .flatten()
             .collect::<Vec<u8>>(),
-    ).unwrap();
+    )?;
 
-    image::DynamicImage::ImageRgb8(buf)
+    Some(image::DynamicImage::ImageRgb8(buf))
 }
 
 pub fn generate_height_image_from_vec(
     fp_vec: &[u32],
     scale: u32,
     fn_color: impl Fn(u8, usize) -> [u8; 3] + Sync,
-) -> image::DynamicImage {
-    let fp_max = fp_vec.iter().max().unwrap();
+) -> Option<image::DynamicImage> {
+    let fp_max = fp_vec.iter().max()?;
 
     let (scaled_fp_vec, ref_vec) =
         visual_rescale_vec_by::<u32, u8>(
@@ -113,7 +111,7 @@ pub fn generate_height_image_from_vec(
             })
             .flatten()
             .collect::<Vec<u8>>(),
-    ).unwrap();
+    )?;
 
-    image::DynamicImage::ImageRgb8(buf)
+    Some(image::DynamicImage::ImageRgb8(buf))
 }
