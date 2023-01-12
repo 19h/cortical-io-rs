@@ -1,6 +1,6 @@
 use std::error::Error;
 
-use crate::{CompareResponse, CreateCategoryFilterRequest, CreateCategoryFilterResponse, Fingerprint, LanguageResponse, Retina, TextEnvelope, TextSlice, TextSliceRequest};
+use crate::{CompareResponse, CreateCategoryFilterRequest, CreateCategoryFilterResponse, Fingerprint, GetTermsRequest, GetTermsResponse, LanguageResponse, Retina, TextEnvelope, TextSlice, TextSliceRequest};
 
 pub struct Cortical {
     pub client: reqwest::Client,
@@ -199,6 +199,42 @@ impl Cortical {
                 )
                 .send()
                 .await?
+                .json()
+                .await?
+        )
+    }
+
+    pub async fn get_terms(
+        &self,
+        retina_name: Option<&str>,
+        term: Option<&str>,
+        get_fingerpint: Option<bool>,
+        start_index: Option<u32>,
+        max_results: Option<u32>,
+    ) -> Result<GetTermsResponse, Box<dyn Error>> {
+        let retina_name = retina_name.unwrap_or("en_general");
+
+        let query =
+            GetTermsRequest {
+                retina_name: retina_name.to_string(),
+                term: term.map(|term| term.to_string()),
+                start_index,
+                max_results,
+                get_fingerprint: get_fingerpint.unwrap_or(false),
+            };
+
+        let response =
+            self.client
+                .get(format!("{}/rest/terms", &self.base_url))
+                .header("Accept", "application/json")
+                .header("Referer", "")
+                .header("Content-Type", "application/json")
+                .query(&query)
+                .send()
+                .await?;
+
+        Ok(
+            response
                 .json()
                 .await?
         )

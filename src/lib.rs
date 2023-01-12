@@ -179,3 +179,23 @@ pub struct CompareResponse {
     #[serde(rename = "cosineSimilarity")]
     pub cosine_similarity: f64,
 }
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct GetTermsRequest {
+    pub retina_name: String,
+    pub term: Option<String>,
+    pub start_index: Option<u32>,
+    pub max_results: Option<u32>,
+    pub get_fingerprint: bool,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Term {
+    pos_types: Option<Vec<String>>,
+    df: Option<f64>,
+    score: Option<f64>,
+    fingerprint: Option<Fingerprint>,
+    term: Option<String>,
+}
+
+pub type GetTermsResponse = Vec<Term>;
