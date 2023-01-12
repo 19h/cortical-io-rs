@@ -1,6 +1,6 @@
 use std::error::Error;
 
-use crate::{CompareResponse, CreateCategoryFilterRequest, CreateCategoryFilterResponse, Fingerprint, GetTermsRequest, GetTermsResponse, LanguageResponse, Retina, TextEnvelope, TextSlice, TextSliceRequest};
+use crate::{CompareResponse, CreateCategoryFilterRequest, CreateCategoryFilterResponse, Fingerprint, GetTermsContextsRequest, GetTermsContextsResponse, GetTermsRequest, GetTermsResponse, GetTermsSimilarTermsRequest, LanguageResponse, PosType, Retina, TextEnvelope, TextSlice, TextSliceRequest};
 
 pub struct Cortical {
     pub client: reqwest::Client,
@@ -226,6 +226,82 @@ impl Cortical {
         let response =
             self.client
                 .get(format!("{}/rest/terms", &self.base_url))
+                .header("Accept", "application/json")
+                .header("Referer", "")
+                .header("Content-Type", "application/json")
+                .query(&query)
+                .send()
+                .await?;
+
+        Ok(
+            response
+                .json()
+                .await?
+        )
+    }
+
+    pub async fn get_terms_contexts(
+        &self,
+        term: &str,
+        retina_name: Option<&str>,
+        get_fingerpint: Option<bool>,
+        start_index: Option<u32>,
+        max_results: Option<u32>,
+    ) -> Result<GetTermsContextsResponse, Box<dyn Error>> {
+        let retina_name = retina_name.unwrap_or("en_general");
+
+        let query =
+            GetTermsContextsRequest {
+                retina_name: retina_name.to_string(),
+                term: term.to_string(),
+                start_index,
+                max_results,
+                get_fingerprint: get_fingerpint.unwrap_or(false),
+            };
+
+        let response =
+            self.client
+                .get(format!("{}/rest/terms/contexts", &self.base_url))
+                .header("Accept", "application/json")
+                .header("Referer", "")
+                .header("Content-Type", "application/json")
+                .query(&query)
+                .send()
+                .await?;
+
+        Ok(
+            response
+                .json()
+                .await?
+        )
+    }
+
+    pub async fn get_terms_similar_terms(
+        &self,
+        term: &str,
+        retina_name: Option<&str>,
+        context_id: Option<&str>,
+        pos_type: Option<PosType>,
+        get_fingerpint: Option<bool>,
+        start_index: Option<u32>,
+        max_results: Option<u32>,
+    ) -> Result<GetTermsResponse, Box<dyn Error>> {
+        let retina_name = retina_name.unwrap_or("en_general");
+
+        let query =
+            GetTermsSimilarTermsRequest {
+                retina_name: retina_name.to_string(),
+                term: term.to_string(),
+                context_id: context_id.map(|c| c.to_string()),
+                pos_type,
+                start_index,
+                max_results,
+                get_fingerprint: get_fingerpint.unwrap_or(false),
+            };
+
+        let response =
+            self.client
+                .get(format!("{}/rest/terms/contexts", &self.base_url))
                 .header("Accept", "application/json")
                 .header("Referer", "")
                 .header("Content-Type", "application/json")

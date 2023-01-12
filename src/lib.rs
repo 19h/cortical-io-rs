@@ -121,6 +121,20 @@ impl TextSliceRequest {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub enum PosType {
+    #[serde(rename = "NOUN")]
+    Noun,
+    #[serde(rename = "ADJECTIVE")]
+    Adjective,
+    #[serde(rename = "VERB")]
+    Verb,
+    #[serde(rename = "NUMBER")]
+    Number,
+    #[serde(rename = "UNKNOWN")]
+    Unknown,
+}
+
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct TextEnvelope {
     pub text: String,
@@ -191,7 +205,7 @@ pub struct GetTermsRequest {
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Term {
-    pos_types: Option<Vec<String>>,
+    pos_types: Option<Vec<PosType>>,
     df: Option<f64>,
     score: Option<f64>,
     fingerprint: Option<Fingerprint>,
@@ -199,3 +213,32 @@ pub struct Term {
 }
 
 pub type GetTermsResponse = Vec<Term>;
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct GetTermsContextsRequest {
+    pub retina_name: String,
+    pub term: String,
+    pub start_index: Option<u32>,
+    pub max_results: Option<u32>,
+    pub get_fingerprint: bool,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct TermContext {
+    fingerprint: Option<Fingerprint>,
+    context: Option<String>,
+    context_label: Option<String>,
+}
+
+pub type GetTermsContextsResponse = Vec<TermContext>;
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct GetTermsSimilarTermsRequest {
+    pub retina_name: String,
+    pub term: String,
+    pub context_id: Option<String>,
+    pub pos_type: Option<PosType>,
+    pub start_index: Option<u32>,
+    pub max_results: Option<u32>,
+    pub get_fingerprint: bool,
+}
