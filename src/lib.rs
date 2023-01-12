@@ -207,11 +207,11 @@ pub struct GetTermsRequest {
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Term {
-    pos_types: Option<Vec<PosType>>,
-    df: Option<f64>,
-    score: Option<f64>,
-    fingerprint: Option<Fingerprint>,
-    term: Option<String>,
+    pub pos_types: Option<Vec<PosType>>,
+    pub df: Option<f64>,
+    pub score: Option<f64>,
+    pub fingerprint: Option<Fingerprint>,
+    pub term: Option<String>,
 }
 
 pub type GetTermsResponse = Vec<Term>;
@@ -227,9 +227,9 @@ pub struct GetTermsContextsRequest {
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct TermContext {
-    fingerprint: Option<Fingerprint>,
-    context: Option<String>,
-    context_label: Option<String>,
+    pub fingerprint: Option<Fingerprint>,
+    pub context: Option<String>,
+    pub context_label: Option<String>,
 }
 
 pub type GetTermsContextsResponse = Vec<TermContext>;
