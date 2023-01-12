@@ -123,14 +123,16 @@ impl TextSliceRequest {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum PosType {
-    #[serde(rename = "NOUN")]
-    Noun,
     #[serde(rename = "ADJECTIVE")]
     Adjective,
-    #[serde(rename = "VERB")]
-    Verb,
+    #[serde(rename = "NOUN")]
+    Noun,
     #[serde(rename = "NUMBER")]
     Number,
+    #[serde(rename = "SYMBOL")]
+    Symbol,
+    #[serde(rename = "VERB")]
+    Verb,
     #[serde(rename = "UNKNOWN")]
     Unknown,
 }
